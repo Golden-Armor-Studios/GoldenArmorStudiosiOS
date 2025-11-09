@@ -1,0 +1,25 @@
+# Ensure text files use LF endings
+* text=auto eol=lf
+
+# Keep Xcode project files with CRLF normalization disabled
+*.pbxproj binary
+*.xcworkspacedata text
+*.xcuserstate binary
+*.xcassets/** binary
+*.storyboard text
+*.xib text
+
+# Preserve images and multimedia as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg text
+*.mp4 binary
+*.mov binary
+*.mp3 binary
+
+# Fonts
+*.otf binary
+*.ttf binary
+

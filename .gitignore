@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+*.moved-aside
+
+# Swift Package Manager
+.build/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Carthage
+Carthage/Build
+
+# Bundler
+.bundle
+
+# Asset catalogs and generated files
+**/*.ipa
+**/*.xcarchive
+
+# User-specific settings
+*.swp
+*~.nib
+profile
+
