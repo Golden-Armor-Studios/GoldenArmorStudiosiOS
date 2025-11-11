@@ -11,6 +11,8 @@ final class News: UIViewController {
     private let headerStack = UIStackView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
+    private let refreshOverlay = UIView()
+    private let refreshSpinner = UIActivityIndicatorView(style: .large)
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let refreshControl = UIRefreshControl()
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
@@ -82,6 +84,7 @@ final class News: UIViewController {
         configureHeaderStack()
         configureTableView(in: hostView)
         configureLoadingIndicators(in: hostView)
+        configureRefreshOverlay(in: hostView)
 
         menuView.attach(to: hostView)
     }
@@ -162,17 +165,51 @@ final class News: UIViewController {
         ])
     }
 
+    private func configureRefreshOverlay(in hostView: UIView) {
+        refreshOverlay.translatesAutoresizingMaskIntoConstraints = false
+        refreshOverlay.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        refreshOverlay.layer.cornerRadius = 20
+        refreshOverlay.layer.masksToBounds = true
+        refreshOverlay.layer.zPosition = 999
+        refreshOverlay.alpha = 0
+        refreshOverlay.isHidden = true
+
+        refreshSpinner.translatesAutoresizingMaskIntoConstraints = false
+        refreshSpinner.hidesWhenStopped = true
+        refreshSpinner.color = .white
+
+        refreshOverlay.addSubview(refreshSpinner)
+        hostView.addSubview(refreshOverlay)
+
+        NSLayoutConstraint.activate([
+            refreshOverlay.centerXAnchor.constraint(equalTo: hostView.centerXAnchor),
+            refreshOverlay.centerYAnchor.constraint(equalTo: hostView.centerYAnchor),
+            refreshOverlay.widthAnchor.constraint(equalToConstant: 116),
+            refreshOverlay.heightAnchor.constraint(equalToConstant: 116),
+
+            refreshSpinner.centerXAnchor.constraint(equalTo: refreshOverlay.centerXAnchor),
+            refreshSpinner.centerYAnchor.constraint(equalTo: refreshOverlay.centerYAnchor)
+        ])
+    }
+
     @objc
     private func handleRefresh() {
-        fetchArticles(showLoader: false)
+        showRefreshOverlay()
+        fetchArticles(showLoader: false, reset: true)
     }
 
     private func updateEmptyState() {
         emptyStateLabel.isHidden = !articles.isEmpty || isLoading
     }
 
-    private func fetchArticles(showLoader: Bool = true) {
-        guard !isLoading else { return }
+    private func fetchArticles(showLoader: Bool = true, reset: Bool = true) {
+        if isLoading {
+            if reset {
+                refreshControl.endRefreshing()
+                hideRefreshOverlay()
+            }
+            return
+        }
         isLoading = true
         updateEmptyState()
         if showLoader {
@@ -187,10 +224,21 @@ final class News: UIViewController {
 
             switch result {
             case .success(let articles):
-                self.articles = articles
+                if reset {
+                    self.articles = articles
+                } else {
+                    var merged = self.articles
+                    let existingIDs = Set(merged.map { $0.id })
+                    let newOnes = articles.filter { !existingIDs.contains($0.id) }
+                    merged.append(contentsOf: newOnes)
+                    self.articles = merged
+                }
                 self.tableView.reloadData()
             case .failure(let error):
                 self.showError(message: error.localizedDescription)
+            }
+            if reset {
+                self.hideRefreshOverlay()
             }
             self.updateEmptyState()
         }
@@ -200,6 +248,24 @@ final class News: UIViewController {
         let alert = UIAlertController(title: "Unable to Load News", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Dismiss", style: .default))
         present(alert, animated: true)
+    }
+
+    private func showRefreshOverlay() {
+        refreshOverlay.isHidden = false
+        refreshOverlay.alpha = 0
+        refreshSpinner.startAnimating()
+        UIView.animate(withDuration: 0.2) {
+            self.refreshOverlay.alpha = 1
+        }
+    }
+
+    private func hideRefreshOverlay() {
+        UIView.animate(withDuration: 0.2, animations: {
+            self.refreshOverlay.alpha = 0
+        }, completion: { _ in
+            self.refreshSpinner.stopAnimating()
+            self.refreshOverlay.isHidden = true
+        })
     }
 }
 
@@ -227,5 +293,10 @@ extension News: UITableViewDataSource, UITableViewDelegate {
             detail.modalPresentationStyle = .fullScreen
             present(detail, animated: true)
         }
+    }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard indexPath.row == articles.count - 1 else { return }
+        fetchArticles(showLoader: false, reset: false)
     }
 }

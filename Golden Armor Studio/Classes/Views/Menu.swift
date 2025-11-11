@@ -322,6 +322,17 @@ final class Menu: UIView {
         updateShadowPath()
     }
 
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if !isOpen {
+            let convertedPoint = convert(point, to: toggleButton)
+            if let toggleView = toggleButton.hitTest(convertedPoint, with: event) {
+                return toggleView
+            }
+            return nil
+        }
+        return super.hitTest(point, with: event)
+    }
+
     private func updateShadowPath() {
         containerView.layer.shadowPath = UIBezierPath(roundedRect: containerView.bounds,
                                                       byRoundingCorners: [.topLeft, .bottomLeft],
