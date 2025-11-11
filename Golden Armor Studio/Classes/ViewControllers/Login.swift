@@ -19,6 +19,11 @@ final class Login: UIViewController {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        if let window = view.window, view.frame != window.bounds {
+            view.frame = window.bounds
+            view.layoutIfNeeded()
+        }
+        print("[LoginVC] viewDidLayoutSubviews – view frame: \(view.frame), window bounds: \(String(describing: view.window?.bounds))")
         Videoplayer.updateLayout(for: backgroundVideoView)
         observeAuthState()
     }
@@ -92,6 +97,7 @@ final class Login: UIViewController {
     }
 
     private func observeAuthState() {
+        guard authListenerToken == nil else { return }
         print("[LoginVC] Registering auth state listener.")
         authListenerToken = AuthSession.shared.addListener { [weak self] user in
             print("[LoginVC] Auth state listener callback on LoginVC with user: \(String(describing: user?.uid))")
@@ -169,6 +175,7 @@ final class Login: UIViewController {
            let window = sceneDelegate.window {
             let navigationController = UINavigationController(rootViewController: newsViewController)
             navigationController.modalPresentationStyle = .fullScreen
+            window.frame = windowScene.coordinateSpace.bounds
             window.rootViewController = navigationController
             window.makeKeyAndVisible()
             print("[LoginVC] Replaced rootViewController with News inside UINavigationController.")

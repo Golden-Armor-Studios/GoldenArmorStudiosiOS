@@ -143,9 +143,9 @@ final class Menu: UIView {
         setup()
     }
 
-    func attach(to viewController: UIViewController) {
-        hostViewController = viewController
-        guard let hostView = viewController.view else { return }
+    func attach(to view: UIView) {
+  
+        let hostView = view
 
         translatesAutoresizingMaskIntoConstraints = false
         hostView.addSubview(self)
@@ -320,6 +320,17 @@ final class Menu: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         updateShadowPath()
+    }
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if !isOpen {
+            let convertedPoint = convert(point, to: toggleButton)
+            if let toggleView = toggleButton.hitTest(convertedPoint, with: event) {
+                return toggleView
+            }
+            return nil
+        }
+        return super.hitTest(point, with: event)
     }
 
     private func updateShadowPath() {
