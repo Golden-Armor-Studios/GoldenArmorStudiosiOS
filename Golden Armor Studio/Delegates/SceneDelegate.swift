@@ -4,8 +4,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let _ = (scene as? UIWindowScene) else { return }
-        window?.backgroundColor = .black
+        guard let windowScene = scene as? UIWindowScene else { return }
+
+        let targetWindow: UIWindow
+        if let existingWindow = window {
+            targetWindow = existingWindow
+        } else {
+            let newWindow = UIWindow(windowScene: windowScene)
+            newWindow.rootViewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
+            window = newWindow
+            targetWindow = newWindow
+        }
+
+        targetWindow.frame = windowScene.coordinateSpace.bounds
+        targetWindow.backgroundColor = .black
+        targetWindow.makeKeyAndVisible()
 
         if let urlContext = connectionOptions.urlContexts.first {
             _ = AuthSession.shared.handleOpenURL(urlContext.url)

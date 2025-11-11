@@ -143,9 +143,9 @@ final class Menu: UIView {
         setup()
     }
 
-    func attach(to viewController: UIViewController) {
-        hostViewController = viewController
-        guard let hostView = viewController.view else { return }
+    func attach(to view: UIView) {
+  
+        let hostView = view
 
         translatesAutoresizingMaskIntoConstraints = false
         hostView.addSubview(self)
