@@ -11,12 +11,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             targetWindow = existingWindow
         } else {
             let newWindow = UIWindow(windowScene: windowScene)
-            newWindow.rootViewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let initialController = storyboard.instantiateInitialViewController() ?? UIViewController()
+            let navigationController = UINavigationController(rootViewController: initialController)
+            navigationController.navigationBar.prefersLargeTitles = false
+            newWindow.rootViewController = navigationController
             window = newWindow
             targetWindow = newWindow
         }
 
-        targetWindow.frame = windowScene.coordinateSpace.bounds
+        let frame = windowScene.screen.bounds
+        print("[SceneDelegate] windowScene screen bounds: \(frame)")
+        targetWindow.frame = frame
         targetWindow.backgroundColor = .black
         targetWindow.makeKeyAndVisible()
 
