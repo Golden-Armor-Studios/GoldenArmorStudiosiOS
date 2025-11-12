@@ -66,7 +66,7 @@ struct NewsComment: Codable {
     let avatarUrl: String?
     let message: String
     let createdAt: FirestoreTimestamp?
-    let likesCount: Int?
+    var likesCount: Int?
     var likedByCurrentUser: Bool?
     let flagsCount: Int?
     var flaggedByCurrentUser: Bool?
@@ -75,6 +75,27 @@ struct NewsComment: Codable {
 struct ToggleFlagResponse: Codable {
     let flagged: Bool
     let flagsCount: Int?
+}
+
+struct NewsEngagement: Codable {
+    let liked: Bool
+    let likesCount: Int
+    let commentsCount: Int?
+}
+
+struct ToggleNewsLikeResponse: Codable {
+    let liked: Bool
+    let likesCount: Int
+}
+
+struct ToggleCommentLikeResponse: Codable {
+    let liked: Bool
+    let likesCount: Int
+}
+
+struct AddNewsCommentResponse: Codable {
+    let comment: NewsComment
+    let commentsCount: Int
 }
 
 struct FirestoreTimestamp: Codable {

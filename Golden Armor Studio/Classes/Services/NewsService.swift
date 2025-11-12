@@ -37,6 +37,22 @@ final class NewsService {
         }
     }
 
+    func fetchEngagement(for articleID: String, completion: @escaping (Result<NewsEngagement, Error>) -> Void) {
+        call(function: "getNewsEngagement", payload: ["id": articleID], requiresAuth: true, completion: completion)
+    }
+
+    func toggleLike(newsID: String, completion: @escaping (Result<ToggleNewsLikeResponse, Error>) -> Void) {
+        call(function: "toggleNewsLike", payload: ["id": newsID], requiresAuth: true, completion: completion)
+    }
+
+    func toggleCommentLike(newsID: String, commentID: String, completion: @escaping (Result<ToggleCommentLikeResponse, Error>) -> Void) {
+        call(function: "toggleNewsCommentLike", payload: ["newsId": newsID, "commentId": commentID], requiresAuth: true, completion: completion)
+    }
+
+    func addComment(newsID: String, message: String, completion: @escaping (Result<AddNewsCommentResponse, Error>) -> Void) {
+        call(function: "addNewsComment", payload: ["id": newsID, "message": message], requiresAuth: true, completion: completion)
+    }
+
     func toggleFlag(newsID: String, commentID: String, completion: @escaping (Result<ToggleFlagResponse, Error>) -> Void) {
         call(function: "toggleNewsCommentFlag", payload: ["newsId": newsID, "commentId": commentID], requiresAuth: true, completion: completion)
     }
